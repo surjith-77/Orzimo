@@ -1,0 +1,721 @@
+/* ==========================================================================
+   ORZIMO AUTHENTICATION & PORTAL STYLES (Welcome.css)
+   Clean, Modern, Production-Grade E-Commerce Login Experience
+   Flipkart-Inspired Palette & Deep Navy Aesthetics:
+     Background:       #070D1E -> #0B132B (Deep Navy Gradient)
+     Card Background:  #111C38 / #0F172A
+     Card Border:      rgba(255, 255, 255, 0.08)
+     Primary Blue:     #2874F0 (Vibrant Blue)
+     Primary Hover:    #1459C7
+     Typography:       #FFFFFF (Heading), #CBD5E1 (Body), #94A3B8 (Muted)
+     Active Glow:      rgba(40, 116, 240, 0.25)
+   ========================================================================== */
+
+.orz-auth-viewport {
+  min-height: 100vh;
+  width: 100%;
+  background: radial-gradient(120% 120% at 50% 0%, #102147 0%, #0B132B 45%, #050814 100%);
+  color: #FFFFFF;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background Subtle Lighting */
+.orz-auth-viewport::before {
+  content: '';
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(40, 116, 240, 0.18) 0%, rgba(23, 78, 166, 0.05) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Minimal Top Header */
+.orz-auth-header {
+  position: relative;
+  z-index: 10;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(11, 19, 43, 0.6);
+  backdrop-filter: blur(12px);
+}
+
+.orz-auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.orz-auth-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(40, 116, 240, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.orz-auth-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.orz-auth-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.orz-auth-brand-name {
+  font-family: var(--font-heading, inherit);
+  font-weight: 900;
+  font-size: 1.35rem;
+  letter-spacing: 1.5px;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.orz-auth-brand-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #60A5FA;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.orz-auth-domain-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.orz-auth-domain-tag strong {
+  color: #FFFFFF;
+}
+
+/* Main Content Container */
+.orz-auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.orz-auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: #111C38;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 30px rgba(40, 116, 240, 0.08);
+  padding: 36px 32px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.orz-auth-card.wide-card {
+  max-width: 520px;
+}
+
+/* Card Header */
+.orz-card-header {
+  text-align: center;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.orz-top-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.orz-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #CBD5E1;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.785rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.orz-back-btn:hover {
+  background: rgba(40, 116, 240, 0.15);
+  border-color: #2874F0;
+  color: #FFFFFF;
+}
+
+/* Role Indicator Pill */
+.orz-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.orz-role-pill.buyer {
+  background: rgba(40, 116, 240, 0.15);
+  border: 1px solid rgba(40, 116, 240, 0.35);
+  color: #60A5FA;
+}
+
+.orz-role-pill.seller {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #38BDF8;
+}
+
+/* Card Brand Center Logo */
+.orz-center-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  padding: 3px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(40, 116, 240, 0.35);
+}
+
+.orz-center-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.orz-card-title {
+  font-family: var(--font-heading, inherit);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+
+.orz-card-subtitle {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   ROLE SELECTION CARDS (Buyer vs Seller)
+   ========================================================================== */
+.orz-role-selection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 28px 0;
+}
+
+.orz-role-card {
+  background: #182547;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+}
+
+.orz-role-card:hover {
+  background: #1C2B52;
+  border-color: rgba(40, 116, 240, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Selected Card Highlight */
+.orz-role-card.selected {
+  border-color: #2874F0;
+  background: rgba(40, 116, 240, 0.12);
+  box-shadow: 0 0 0 1px #2874F0, 0 10px 24px rgba(40, 116, 240, 0.22);
+}
+
+.orz-role-card-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #2874F0;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.2s ease;
+}
+
+.orz-role-card.selected .orz-role-card-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.orz-role-icon-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
+  margin-bottom: 14px;
+  transition: all 0.25s ease;
+}
+
+.orz-role-card:hover .orz-role-icon-box {
+  color: #FFFFFF;
+  background: rgba(40, 116, 240, 0.2);
+  border-color: rgba(40, 116, 240, 0.4);
+}
+
+.orz-role-card.selected .orz-role-icon-box {
+  background: #2874F0;
+  border-color: #2874F0;
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(40, 116, 240, 0.4);
+}
+
+.orz-role-card-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+}
+
+.orz-role-card-tag {
+  font-size: 0.725rem;
+  color: #94A3B8;
+}
+
+.orz-role-card.selected .orz-role-card-tag {
+  color: #93C5FD;
+}
+
+/* Continue Button */
+.orz-btn-primary {
+  width: 100%;
+  background: #2874F0;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 20px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(40, 116, 240, 0.35);
+}
+
+.orz-btn-primary:hover:not(:disabled) {
+  background: #1459C7;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(40, 116, 240, 0.45);
+}
+
+.orz-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.orz-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Secondary Button */
+.orz-btn-secondary {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #CBD5E1;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 0.885rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.orz-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   FORM INPUTS & CONTROLS
+   ========================================================================== */
+.orz-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orz-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.orz-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.orz-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #CBD5E1;
+}
+
+.orz-forgot-link {
+  font-size: 0.775rem;
+  color: #60A5FA;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.orz-forgot-link:hover {
+  color: #93C5FD;
+  text-decoration: underline;
+}
+
+.orz-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.orz-input-icon {
+  position: absolute;
+  left: 14px;
+  color: #64748B;
+  pointer-events: none;
+}
+
+.orz-input {
+  width: 100%;
+  background: #0B132B;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  padding: 11px 14px;
+  padding-left: 42px;
+  font-size: 0.9rem;
+  color: #FFFFFF;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.orz-input.no-icon {
+  padding-left: 14px;
+}
+
+.orz-input::placeholder {
+  color: #64748B;
+}
+
+.orz-input:focus {
+  outline: none;
+  border-color: #2874F0;
+  box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.25);
+  background: #090F24;
+}
+
+.orz-input-btn-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.orz-input-btn-toggle:hover {
+  color: #CBD5E1;
+}
+
+/* Custom Select Dropdown */
+.orz-select {
+  width: 100%;
+  background: #0B132B;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  padding: 11px 14px;
+  font-size: 0.9rem;
+  color: #FFFFFF;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.orz-select:focus {
+  outline: none;
+  border-color: #2874F0;
+  box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.25);
+}
+
+.orz-select option {
+  background: #111C38;
+  color: #FFFFFF;
+}
+
+/* Divider */
+.orz-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 18px 0;
+  color: #64748B;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.orz-divider::before,
+.orz-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.orz-divider::before {
+  margin-right: 12px;
+}
+
+.orz-divider::after {
+  margin-left: 12px;
+}
+
+/* Auth Mode Footer Switch */
+.orz-auth-switch {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 0.85rem;
+  color: #94A3B8;
+}
+
+.orz-switch-btn {
+  background: none;
+  border: none;
+  color: #60A5FA;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 5px;
+  font-size: inherit;
+  transition: color 0.15s ease;
+}
+
+.orz-switch-btn:hover {
+  color: #93C5FD;
+  text-decoration: underline;
+}
+
+/* Error & Notice Banners */
+.orz-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 0.825rem;
+  line-height: 1.45;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.orz-alert.error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+.orz-alert.success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+
+.orz-alert.info {
+  background: rgba(40, 116, 240, 0.12);
+  border: 1px solid rgba(40, 116, 240, 0.3);
+  color: #93C5FD;
+}
+
+/* Phone OTP View Elements */
+.orz-otp-grid {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.orz-country-select {
+  width: 110px;
+  background: #0B132B;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  padding: 11px 10px;
+  font-size: 0.85rem;
+  color: #FFFFFF;
+  font-family: inherit;
+}
+
+.orz-otp-digits-input {
+  letter-spacing: 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.orz-resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.775rem;
+  color: #94A3B8;
+  margin-top: 6px;
+}
+
+.orz-resend-btn {
+  background: none;
+  border: none;
+  color: #60A5FA;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+}
+
+.orz-resend-btn:disabled {
+  color: #64748B;
+  cursor: not-allowed;
+}
+
+/* Google OAuth Button */
+.orz-google-btn {
+  width: 100%;
+  background: #FFFFFF;
+  color: #1E293B;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 0.885rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.orz-google-btn:hover {
+  background: #F8FAFC;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.orz-google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 520px) {
+  .orz-auth-header {
+    padding: 14px 16px;
+  }
+
+  .orz-auth-domain-tag {
+    display: none;
+  }
+
+  .orz-auth-card {
+    padding: 26px 20px;
+    border-radius: 16px;
+  }
+
+  .orz-role-selection-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .orz-role-card {
+    flex-direction: row;
+    gap: 16px;
+    justify-content: flex-start;
+    padding: 16px;
+    text-align: left;
+  }
+
+  .orz-role-icon-box {
+    margin-bottom: 0;
+    width: 48px;
+    height: 48px;
+  }
+}

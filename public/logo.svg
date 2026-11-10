@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  <defs>
+    <linearGradient id="logoCircleGrad" x1="5" y1="5" x2="59" y2="59" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00E5FF" />
+      <stop offset="50%" stop-color="#0066FF" />
+      <stop offset="100%" stop-color="#0A1128" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="75" y1="20" x2="250" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E3A8A" />
+    </linearGradient>
+    <filter id="logoShadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0066FF" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <!-- Circular checkmark icon -->
+  <g transform="translate(4, 4)">
+    <circle cx="28" cy="28" r="26" fill="url(#logoCircleGrad)" filter="url(#logoShadow)"/>
+    <circle cx="28" cy="28" r="24" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+    <path d="M16 28.5 L24.5 37 L40 20" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- Brand Name Typography -->
+  <text x="72" y="42" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-size="34" font-weight="900" letter-spacing="1.5" fill="#0A1128">ORZIMO</text>
+  <circle cx="225" cy="40" r="4" fill="#00E5FF" />
+  <text x="73" y="55" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="10" font-weight="600" letter-spacing="2.2" fill="#0066FF">CREATOR MARKETPLACE</text>
+</svg>
