@@ -8,7 +8,6 @@ import {
   Store, 
   Package, 
   X, 
-  ChevronDown, 
   Sparkles,
   TrendingUp,
   Clock
@@ -27,6 +26,7 @@ export default function Header({
   onOpenAuth, 
   onOpenSellerModal,
   onOpenMyOrders,
+  onOpenWishlist,
   onNavigateSeller,
   currentUser,
   selectedCategory,
@@ -244,7 +244,7 @@ export default function Header({
             {/* Wishlist */}
             <button 
               className="nav-action-btn"
-              onClick={() => onOpenAuth('wishlist')}
+              onClick={onOpenWishlist || (() => onOpenAuth('wishlist'))}
               title="View your saved products"
             >
               <Heart size={22} />

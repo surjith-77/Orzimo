@@ -9,7 +9,9 @@ import CreatorBanner from '../components/buyer/CreatorBanner';
 import Footer from '../components/buyer/Footer';
 import AuthModal from '../components/common/AuthModal';
 import AccountModal from '../components/common/AccountModal';
-import MyOrdersModal from '../components/buyer/MyOrdersModal';
+import OrdersSidebar from '../components/buyer/OrdersSidebar';
+import WishlistSidebar from '../components/buyer/WishlistSidebar';
+import CartSidebar from '../components/buyer/CartSidebar';
 import PincodeChangeModal from '../components/common/PincodeChangeModal';
 import AddressFormModal from '../components/common/AddressFormModal';
 import { useAuth } from '../context/AuthContext';
@@ -19,9 +21,7 @@ import {
   X,
   ShoppingBag,
   Calendar,
-  Trash2,
   CheckCircle2,
-  ArrowRight,
   Store,
   ShieldCheck,
   Star,
@@ -41,17 +41,25 @@ export default function BuyerApp() {
     deliveryLocation,
     updateDeliveryLocation,
     buyerAddresses,
-    addOrUpdateBuyerAddress
+    addOrUpdateBuyerAddress,
+    wishlist,
+    toggleWishlist,
+    removeFromWishlist
   } = useMarketplace();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  
+  // Single active sidebar ensures only one of Cart, Orders, or Wishlist is open at a time
+  const [activeSidebar, setActiveSidebar] = useState(null); // 'cart' | 'orders' | 'wishlist' | null
+  const handleOpenCart = () => setActiveSidebar('cart');
+  const handleOpenOrders = () => setActiveSidebar('orders');
+  const handleOpenWishlist = () => setActiveSidebar('wishlist');
+  const handleCloseSidebar = () => setActiveSidebar(null);
+
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
   const [isSellerModalOpen, setIsSellerModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isPincodeModalOpen, setIsPincodeModalOpen] = useState(false);
@@ -204,17 +212,13 @@ export default function BuyerApp() {
     setCart((prev) => prev.filter((item) => item.key !== key));
   };
 
-  const handleToggleWishlist = (product) => {
-    setWishlist((prev) => {
-      const exists = prev.some((p) => p.id === product.id);
-      if (exists) {
-        showToast(`Removed from saved items.`);
-        return prev.filter((p) => p.id !== product.id);
-      } else {
-        showToast(`Saved to your wishlist!`);
-        return [...prev, product];
-      }
-    });
+  const handleToggleWishlist = async (product) => {
+    const isSaved = await toggleWishlist(product);
+    if (isSaved) {
+      showToast(`Saved to your wishlist!`);
+    } else {
+      showToast(`Removed from saved items.`);
+    }
   };
 
   // Group cart items by seller into shipments
@@ -331,9 +335,8 @@ export default function BuyerApp() {
     });
 
     setCart([]);
-    setIsCartOpen(false);
     showToast(`Order #${newOrder.id} confirmed! Kitchen notified for slot.`);
-    setIsMyOrdersOpen(true);
+    setActiveSidebar('orders');
   };
 
   return (
@@ -351,8 +354,10 @@ export default function BuyerApp() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         cartCount={cartItemCount}
-        wishlistCount={wishlist.length}
-        onOpenCart={() => setIsCartOpen(true)}
+        wishlistCount={wishlist?.length || 0}
+        onOpenCart={handleOpenCart}
+        onOpenMyOrders={handleOpenOrders}
+        onOpenWishlist={handleOpenWishlist}
         onOpenAuth={(_mode) => {
           if (currentUser) {
             setIsAccountOpen(true);
@@ -361,7 +366,6 @@ export default function BuyerApp() {
           }
         }}
         onOpenSellerModal={() => setIsSellerModalOpen(true)}
-        onOpenMyOrders={() => setIsMyOrdersOpen(true)}
         onNavigateSeller={() => {
           if (currentUser?.role === 'seller') {
             navigate('/seller');
@@ -423,274 +427,36 @@ export default function BuyerApp() {
       />
 
       {/* =========================================================================
-          SLIDE-OVER CART DRAWER
+          SLIDE-OVER SIDEBAR DRAWERS (CART, ORDERS, WISHLIST)
          ========================================================================= */}
-      {isCartOpen && (
-        <div className="cart-drawer-backdrop" onClick={() => setIsCartOpen(false)}>
-          <div className="cart-drawer" onClick={(e) => e.stopPropagation()}>
-            <div className="cart-drawer-header">
-              <div className="cart-drawer-title">
-                <ShoppingBag size={20} color="var(--color-yellow)" />
-                <span>Your Pre-Order Cart ({cartItemCount})</span>
-              </div>
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="btn-icon"
-                style={{ color: '#FFFFFF' }}
-                aria-label="Close cart"
-              >
-                <X size={20} />
-              </button>
-            </div>
+      <CartSidebar
+        isOpen={activeSidebar === 'cart'}
+        onClose={handleCloseSidebar}
+        cart={cart}
+        cartItemCount={cartItemCount}
+        cartTotal={cartTotal}
+        shipmentGroups={shipmentGroups}
+        shipmentEstimates={shipmentEstimates}
+        deliveryLocation={deliveryLocation}
+        hasUnserviceableItem={hasUnserviceableItem}
+        totalShippingFee={totalShippingFee}
+        onUpdateQty={handleUpdateQty}
+        onRemoveFromCart={handleRemoveFromCart}
+        onOpenPincodeModal={() => setIsPincodeModalOpen(true)}
+        onConfirmPreOrder={handleConfirmPreOrder}
+      />
 
-            {/* Cart Delivery Destination Bar */}
-            <div style={{
-              background: '#F1F5F9',
-              borderBottom: '1px solid #E2E8F0',
-              padding: '10px 18px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '10px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={16} color="var(--color-primary)" />
-                <div style={{ fontSize: '0.8rem' }}>
-                  <span style={{ color: '#64748B' }}>Deliver to: </span>
-                  <strong style={{ color: 'var(--color-navy)' }}>
-                    {deliveryLocation?.locality || deliveryLocation?.district || 'Bengaluru'} — {deliveryLocation?.pincode || '560001'}
-                  </strong>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsPincodeModalOpen(true)}
-                style={{
-                  background: '#FFFFFF',
-                  border: '1px solid #CBD5E1',
-                  padding: '3px 8px',
-                  borderRadius: '4px',
-                  color: 'var(--color-primary)',
-                  fontSize: '0.725rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                Change PIN
-              </button>
-            </div>
+      <OrdersSidebar
+        isOpen={activeSidebar === 'orders'}
+        onClose={handleCloseSidebar}
+      />
 
-            {cart.length === 0 ? (
-              <div style={{ padding: '60px 24px', textAlign: 'center' }}>
-                <ShoppingBag size={48} color="var(--gray-300)" style={{ margin: '0 auto 16px' }} />
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Your cart is empty</h3>
-                <p style={{ color: 'var(--gray-500)', fontSize: '0.875rem', marginBottom: '20px' }}>
-                  Explore bespoke creations, freshly baked cakes, and artisan gifts.
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setIsCartOpen(false)}
-                >
-                  Start Exploring
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="cart-items-list">
-                  {hasUnserviceableItem && (
-                    <div style={{
-                      background: 'rgba(239, 68, 68, 0.08)',
-                      border: '1px solid rgba(239, 68, 68, 0.3)',
-                      borderRadius: '8px',
-                      padding: '12px 14px',
-                      margin: '12px 18px 0',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px'
-                    }}>
-                      <AlertCircle size={18} color="#EF4444" style={{ flexShrink: 0, marginTop: 2 }} />
-                      <div>
-                        <div style={{ fontSize: '0.825rem', fontWeight: 800, color: '#B91C1C' }}>
-                          Delivery Unserviceable for PIN {deliveryLocation?.pincode}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: 2, lineHeight: 1.4 }}>
-                          Fresh cakes and bakes require local courier delivery within the creator's district. Please remove unserviceable items or update your delivery PIN.
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {shipmentGroups.map((group, groupIdx) => (
-                    <div key={group.sellerKey} style={{
-                      margin: '12px 18px',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      background: '#FFFFFF'
-                    }}>
-                      {/* Shipment Group Header */}
-                      <div style={{
-                        background: '#F8FAFC',
-                        padding: '10px 14px',
-                        borderBottom: '1px solid #E2E8F0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        fontSize: '0.78rem'
-                      }}>
-                        <div>
-                          <div style={{ fontWeight: 800, color: 'var(--color-navy)' }}>
-                            Shipment {groupIdx + 1}: {group.sellerName}
-                          </div>
-                          <div style={{ fontSize: '0.7rem', color: '#64748B' }}>
-                            Ships from: {group.sellerDispatchCity} ({group.sellerDispatchPin})
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{ 
-                            fontWeight: 700, 
-                            color: group.isFreeShipping ? '#059669' : '#334155' 
-                          }}>
-                            {group.isFreeShipping ? 'FREE Shipping' : `Shipping: ₹${group.shippingFee}`}
-                          </span>
-                          <div style={{ fontSize: '0.7rem', color: '#059669', fontWeight: 600 }}>
-                            ETD: {group.formattedEstimate}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Items in this Shipment */}
-                      {group.items.map((item) => {
-                        const itemEst = shipmentEstimates[item.key];
-                        const isServiceable = itemEst ? itemEst.serviceable : true;
-
-                        return (
-                          <div key={item.key} className="cart-item-card" style={{ borderBottom: '1px solid #F1F5F9', margin: 0, borderRadius: 0 }}>
-                            <img src={item.image} alt={item.name} className="cart-item-img" />
-                            <div className="cart-item-details">
-                              <div className="cart-item-title">{item.name}</div>
-                              
-                              {(item.weight || item.flavor) && (
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-primary)', marginBottom: '4px' }}>
-                                  {item.weight && <span>{item.weight} </span>}
-                                  {item.flavor && <span>• {item.flavor}</span>}
-                                </div>
-                              )}
-
-                              {/* Serviceability & ETA Indicator */}
-                              {!isServiceable ? (
-                                <div style={{ 
-                                  fontSize: '0.72rem', 
-                                  color: '#DC2626', 
-                                  background: '#FEF2F2', 
-                                  padding: '2px 6px', 
-                                  borderRadius: 4, 
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: 4,
-                                  marginBottom: 6,
-                                  fontWeight: 700
-                                }}>
-                                  <AlertCircle size={12} /> Unserviceable to PIN {deliveryLocation?.pincode}
-                                </div>
-                              ) : (
-                                <div style={{ 
-                                  fontSize: '0.72rem', 
-                                  color: '#059669', 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  gap: 4, 
-                                  marginBottom: 6 
-                                }}>
-                                  <Truck size={12} /> {itemEst?.formattedEstimate ? `Arrives by: ${itemEst.formattedEstimate}` : 'Serviceable'}
-                                </div>
-                              )}
-
-                              {item.slotDate && (
-                                <div style={{ fontSize: '0.72rem', color: '#475569', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                                  <Calendar size={12} /> Target Slot: {item.slotDate}
-                                </div>
-                              )}
-
-                              {item.message && (
-                                <div style={{ fontSize: '0.75rem', color: 'var(--color-navy)', background: '#F1F5F9', padding: '4px 8px', borderRadius: 4, marginBottom: 8 }}>
-                                  Msg: "{item.message}"
-                                </div>
-                              )}
-
-                              <div className="cart-item-price-row">
-                                <span style={{ fontWeight: 800, color: 'var(--color-navy)' }}>
-                                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                                </span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <div className="cart-qty-controls">
-                                    <button className="qty-btn" onClick={() => handleUpdateQty(item.key, -1)}>-</button>
-                                    <span style={{ fontSize: '0.85rem', fontWeight: 700, padding: '0 6px' }}>{item.quantity}</span>
-                                    <button className="qty-btn" onClick={() => handleUpdateQty(item.key, 1)}>+</button>
-                                  </div>
-                                  <button 
-                                    onClick={() => handleRemoveFromCart(item.key)}
-                                    className="btn-icon"
-                                    style={{ color: '#EF4444' }}
-                                    title="Remove item"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="cart-drawer-footer">
-                  <div className="cart-summary-row">
-                    <span>Subtotal</span>
-                    <span>₹{cartTotal.toLocaleString('en-IN')}</span>
-                  </div>
-                  <div className="cart-summary-row">
-                    <span>Creator Handling & Packaging</span>
-                    <span style={{ color: '#059669', fontWeight: 600 }}>FREE</span>
-                  </div>
-                  <div className="cart-summary-row">
-                    <span>Courier & Delivery Fees</span>
-                    <span style={{ color: totalShippingFee === 0 ? '#059669' : 'var(--color-navy)', fontWeight: 600 }}>
-                      {totalShippingFee === 0 ? 'FREE' : `₹${totalShippingFee}`}
-                    </span>
-                  </div>
-                  <div className="cart-total-row">
-                    <span>Total Amount</span>
-                    <span style={{ color: 'var(--color-primary)' }}>
-                      ₹{(cartTotal + totalShippingFee).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                  <button
-                    className="btn btn-primary"
-                    style={{ 
-                      width: '100%', 
-                      padding: '14px', 
-                      fontSize: '1rem',
-                      opacity: hasUnserviceableItem ? 0.6 : 1,
-                      cursor: hasUnserviceableItem ? 'not-allowed' : 'pointer'
-                    }}
-                    disabled={hasUnserviceableItem}
-                    onClick={handleConfirmPreOrder}
-                  >
-                    {hasUnserviceableItem ? 'Resolve Unserviceable Items' : 'Confirm & Reserve Slot'}
-                    <ArrowRight size={18} />
-                  </button>
-                  <div style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--gray-500)', marginTop: '10px' }}>
-                    100% Encrypted UPI / Card Checkout via Razorpay
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <WishlistSidebar
+        isOpen={activeSidebar === 'wishlist'}
+        onClose={handleCloseSidebar}
+        onAddToCart={(prod) => handleAddToCart(prod)}
+        onProductClick={handleOpenQuickView}
+      />
 
       {/* =========================================================================
           PRODUCT CUSTOMIZATION & PRE-BOOKING MODAL (QUICK VIEW)
@@ -1016,7 +782,8 @@ export default function BuyerApp() {
       <AccountModal
         isOpen={isAccountOpen}
         onClose={() => setIsAccountOpen(false)}
-        onOpenOrders={() => setIsMyOrdersOpen(true)}
+        onOpenOrders={handleOpenOrders}
+        onOpenWishlist={handleOpenWishlist}
         onOpenSellerModal={() => {
           switchRole('seller');
           navigate('/seller');
@@ -1035,14 +802,6 @@ export default function BuyerApp() {
             navigate('/seller');
           }
         }}
-      />
-
-      {/* =========================================================================
-          BUYER PRE-ORDER TRACKING MODAL
-         ========================================================================= */}
-      <MyOrdersModal
-        isOpen={isMyOrdersOpen}
-        onClose={() => setIsMyOrdersOpen(false)}
       />
 
       {/* =========================================================================

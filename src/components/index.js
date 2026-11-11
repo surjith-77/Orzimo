@@ -9,6 +9,9 @@ export { default as Footer } from './buyer/Footer';
 export { default as Header } from './buyer/Header';
 export { default as HeroBanners } from './buyer/HeroBanners';
 export { default as MyOrdersModal } from './buyer/MyOrdersModal';
+export { default as OrdersSidebar } from './buyer/OrdersSidebar';
+export { default as WishlistSidebar } from './buyer/WishlistSidebar';
+export { default as CartSidebar } from './buyer/CartSidebar';
 export { default as ProductCard } from './buyer/ProductCard';
 export { default as ProductSection } from './buyer/ProductSection';
 export { default as TrustStrip } from './buyer/TrustStrip';
@@ -34,4 +37,5 @@ export { default as AddressFormModal } from './common/AddressFormModal';
 export { default as AuthModal } from './common/AuthModal';
 export { default as PincodeChangeModal } from './common/PincodeChangeModal';
 export { default as ProtectedRoute } from './common/ProtectedRoute';
+export { default as SidebarDrawer } from './common/SidebarDrawer';
 

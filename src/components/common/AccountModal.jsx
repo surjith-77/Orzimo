@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, User, Phone, MapPin, Mail, LogOut, Store, Package } from 'lucide-react';
+import { X, User, Phone, MapPin, Mail, LogOut, Store, Package, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function AccountModal({ isOpen, onClose, onOpenOrders, onOpenSellerModal }) {
+export default function AccountModal({ isOpen, onClose, onOpenOrders, onOpenWishlist, onOpenSellerModal }) {
   const navigate = useNavigate();
   const { currentUser, logout, isSeller } = useAuth();
 
@@ -118,6 +118,19 @@ export default function AccountModal({ isOpen, onClose, onOpenOrders, onOpenSell
           >
             <Package size={18} color="var(--color-primary)" />
             <span>My Orders & Bookings</span>
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ width: '100%', justifyContent: 'flex-start', padding: '10px 14px' }}
+            onClick={() => {
+              onClose();
+              if (onOpenWishlist) onOpenWishlist();
+            }}
+          >
+            <Heart size={18} color="var(--color-primary)" />
+            <span>My Saved Wishlist</span>
           </button>
 
           {isSeller ? (

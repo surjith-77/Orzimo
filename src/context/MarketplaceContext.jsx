@@ -25,7 +25,10 @@ import {
   getSellerAddressAsync,
   saveSellerAddress,
   getActiveDeliveryLocation,
-  setActiveDeliveryLocation
+  setActiveDeliveryLocation,
+  getWishlist,
+  addToWishlist as dbAddToWishlist,
+  removeFromWishlist as dbRemoveFromWishlist
 } from '../services/db';
 import { useAuth } from './AuthContext';
 
@@ -40,6 +43,8 @@ export function MarketplaceProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [sellerSettings, setSellerSettings] = useState(() => getSellerSettings(currentUser?.id));
   const [isLoading, setIsLoading] = useState(true);
+  const [wishlist, setWishlist] = useState([]);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   // Delivery Location & Address States
   const [deliveryLocation, setDeliveryLocation] = useState(() => getActiveDeliveryLocation());
@@ -50,17 +55,19 @@ export function MarketplaceProvider({ children }) {
   const refreshData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [fetchedProducts, fetchedOrders, fetchedBookings, fetchedNotifs] = await Promise.all([
+      const [fetchedProducts, fetchedOrders, fetchedBookings, fetchedNotifs, fetchedWishlist] = await Promise.all([
         getProducts(),
         getOrders(),
         getBookings(),
-        getNotifications(currentUser?.id)
+        getNotifications(currentUser?.id),
+        getWishlist(currentUser?.id)
       ]);
 
       setProducts(fetchedProducts || []);
       setOrders(fetchedOrders || []);
       setBookingRequests(fetchedBookings || []);
       setNotifications(fetchedNotifs || []);
+      setWishlist(fetchedWishlist || []);
 
       if (currentUser?.id) {
         const addrs = getBuyerAddresses(currentUser.id);
@@ -111,7 +118,50 @@ export function MarketplaceProvider({ children }) {
         if (sAddr) setSellerAddress(sAddr);
       });
     }
+
+    let isCurrent = true;
+    setIsWishlistLoading(true);
+    getWishlist(currentUser?.id)
+      .then(w => {
+        if (isCurrent) setWishlist(w || []);
+      })
+      .finally(() => {
+        if (isCurrent) setIsWishlistLoading(false);
+      });
+    return () => { isCurrent = false; };
   }, [currentUser]);
+
+  // ============================================================================
+  // WISHLIST OPERATIONS (Persistent Buyer Saved Products)
+  // ============================================================================
+  const addToWishlist = async (product) => {
+    if (!product || !product.id) return;
+    if (wishlist.some(p => p.id === product.id)) return;
+    await dbAddToWishlist(currentUser?.id, product);
+    setWishlist(prev => [product, ...prev]);
+  };
+
+  const removeFromWishlist = async (productId) => {
+    if (!productId) return;
+    await dbRemoveFromWishlist(currentUser?.id, productId);
+    setWishlist(prev => prev.filter(p => p.id !== productId));
+  };
+
+  const toggleWishlist = async (product) => {
+    if (!product || !product.id) return false;
+    const exists = wishlist.some(p => p.id === product.id);
+    if (exists) {
+      await removeFromWishlist(product.id);
+      return false;
+    } else {
+      await addToWishlist(product);
+      return true;
+    }
+  };
+
+  const isInWishlist = (productId) => {
+    return wishlist.some(p => p.id === productId);
+  };
 
   // ============================================================================
   // DELIVERY LOCATION & BUYER ADDRESSES
@@ -417,7 +467,13 @@ export function MarketplaceProvider({ children }) {
       markNotificationRead,
       markAllNotificationsRead,
       clearNotification,
-      updateSellerSettings
+      updateSellerSettings,
+      wishlist,
+      isWishlistLoading,
+      addToWishlist,
+      removeFromWishlist,
+      toggleWishlist,
+      isInWishlist
     }}>
       {children}
     </MarketplaceContext.Provider>

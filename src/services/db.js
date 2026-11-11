@@ -461,6 +461,92 @@ export async function deleteProduct(id) {
 }
 
 // ------------------------------------------------------------------------------
+// 4.5. BUYER WISHLIST DATA ACCESS (SUPABASE & PERSISTENT LOCAL STORAGE)
+// ------------------------------------------------------------------------------
+export async function getWishlist(userId) {
+  if (isSupabaseConfigured && supabase && userId) {
+    try {
+      const { data, error } = await supabase
+        .from('wishlists')
+        .select('*, product:products(*)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map(w => {
+          const prod = w.product || {};
+          return {
+            ...prod,
+            id: prod.id || w.product_id,
+            wishlistId: w.id,
+            savedAt: w.created_at
+          };
+        }).filter(p => p.id);
+      }
+    } catch (err) {
+      console.warn('Supabase getWishlist error, reading persistent storage:', err);
+    }
+  }
+
+  const stored = loadFromStorage(STORAGE_KEYS.WISHLIST, []);
+  if (userId) {
+    return stored.filter(item => !item.userId || item.userId === userId);
+  }
+  return stored;
+}
+
+export async function addToWishlist(userId, product) {
+  if (!product || !product.id) return null;
+
+  if (isSupabaseConfigured && supabase && userId) {
+    try {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(String(product.id)) && uuidRegex.test(String(userId))) {
+        await supabase.from('wishlists').upsert({
+          user_id: userId,
+          product_id: product.id
+        }, { onConflict: 'user_id,product_id' });
+      }
+    } catch (err) {
+      console.warn('Supabase addToWishlist error:', err);
+    }
+  }
+
+  const current = loadFromStorage(STORAGE_KEYS.WISHLIST, []);
+  const exists = current.some(item => item.id === product.id && (!userId || item.userId === userId));
+  if (!exists) {
+    const itemToStore = {
+      ...product,
+      userId: userId || null,
+      savedAt: new Date().toISOString()
+    };
+    const updated = [itemToStore, ...current];
+    saveToStorage(STORAGE_KEYS.WISHLIST, updated);
+    return itemToStore;
+  }
+  return null;
+}
+
+export async function removeFromWishlist(userId, productId) {
+  if (!productId) return;
+
+  if (isSupabaseConfigured && supabase && userId) {
+    try {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(String(productId)) && uuidRegex.test(String(userId))) {
+        await supabase.from('wishlists').delete().eq('user_id', userId).eq('product_id', productId);
+      }
+    } catch (err) {
+      console.warn('Supabase removeFromWishlist error:', err);
+    }
+  }
+
+  const current = loadFromStorage(STORAGE_KEYS.WISHLIST, []);
+  const updated = current.filter(item => !(item.id === productId && (!userId || item.userId === userId)));
+  saveToStorage(STORAGE_KEYS.WISHLIST, updated);
+}
+
+// ------------------------------------------------------------------------------
 // 4. ORDERS DATA ACCESS
 // ------------------------------------------------------------------------------
 export async function getOrders(filter = {}) {
